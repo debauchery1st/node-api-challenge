@@ -53,14 +53,28 @@ function hasField(fieldName) {
   };
 }
 
-const hasName = hasField("name"); // action & project
-const hasDescription = hasField("description"); // action & project
-const hasProjectId = hasField("project_id"); // action
+function replicateProject(req, res, nxt) {
+  // return an array containing one project.
+  proj
+    .get()
+    .then(
+      lst =>
+        (req.replicator = lst.filter(
+          p => Number(p.id) === Number(req.params.id)
+        )) && nxt()
+    )
+    .catch(err => (req.replicator = []) && nxt());
+}
+
+const bodyHasName = hasField("name"); // action & project
+const bodyHasDescription = hasField("description"); // action & project
+const bodyHasProjectId = hasField("project_id"); // action
 
 module.exports = {
   validateProjectId,
   hasBody,
-  hasProjectId,
-  hasDescription,
-  hasName
+  bodyHasName,
+  bodyHasDescription,
+  bodyHasProjectId,
+  replicateProject
 };

@@ -1,4 +1,5 @@
 const proj = require("../data/helpers/projectModel");
+const acts = require("../data/helpers/actionModel");
 
 function validateProjectId(req, res, nxt) {
   const project_id = Number(req.params.id);
@@ -23,27 +24,6 @@ function hasBody(req, res, nxt) {
     : res.status(400).json({ errorMessage: "no body" });
 }
 
-// function hasProjectId(req, res, nxt) {
-//   // check for project_id
-//   Object.keys(req.body).includes("project_id")
-//     ? nxt()
-//     : res.status(400).json({ errorMessage: "project id required" });
-// }
-
-// function hasDescription(req, res, nxt) {
-//   // check for a description in the body
-//   Object.keys(req.body).includes("description")
-//     ? nxt()
-//     : res.status(400).json({ errorMessage: "description required" });
-// }
-
-// function hasName(req, res, nxt) {
-//   // check for a description in the body
-//   Object.keys(req.body).includes("name")
-//     ? nxt()
-//     : res.status(400).json({ errorMessage: "name required" });
-// }
-
 function hasField(fieldName) {
   return function(req, res, nxt) {
     // check for a description in the body
@@ -66,15 +46,31 @@ function replicateProject(req, res, nxt) {
     .catch(err => (req.replicator = []) && nxt());
 }
 
+function replicateAction(req, res, nxt) {
+  // return an array containing one project.
+  acts
+    .get()
+    .then(
+      lst =>
+        (req.replicator = lst.filter(
+          p => Number(p.id) === Number(req.params.id)
+        )) && nxt()
+    )
+    .catch(err => (req.replicator = []) && nxt());
+}
+
 const bodyHasName = hasField("name"); // action & project
 const bodyHasDescription = hasField("description"); // action & project
 const bodyHasProjectId = hasField("project_id"); // action
+const bodyHasNotes = hasField("notes"); // action
 
 module.exports = {
   validateProjectId,
+  replicateProject,
+  replicateAction,
   hasBody,
   bodyHasName,
   bodyHasDescription,
   bodyHasProjectId,
-  replicateProject
+  bodyHasNotes
 };

@@ -1,12 +1,14 @@
 const express = require("express");
 const server = express();
 const helmet = require("helmet");
+const cors = require("cors");
 const port = process.env.PORT;
 
 // built-in middleware
 server.use(express.json());
 
 // third-party middleware
+server.use(cors());
 server.use(helmet());
 
 // local routers
